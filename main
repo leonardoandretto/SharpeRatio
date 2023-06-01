@@ -1,0 +1,21 @@
+import yfinance as yf
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = yf.download(["SPY", "AAPL"], start="2000-01-01", end="2022-12-31")
+
+closes = data['Adj Close']
+spy_returns = closes.SPY.pct_change().dropna()
+aapl_returns = closes.AAPL.pct_change().dropna()
+
+
+def sharpe_ratio(returns, adjustment_factor=0.0):
+    returns_risk_adj = returns - adjustment_factor
+    return(returns_risk_adj.mean() / returns_risk_adj.std()) * np.sqrt(252)
+
+
+print(f"Sharpe Ratio SPY: {sharpe_ratio(spy_returns):.2f}")  # sharpe ratio for SPY
+print(f"Sharpe Ratio AAPL: {sharpe_ratio(aapl_returns):.2f}")  # sharpe ratio for AAPL
+
+print(aapl_returns.rolling(30).apply(sharpe_ratio).hist(bins=50))
+plt.show()
